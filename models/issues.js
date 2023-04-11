@@ -1,3 +1,5 @@
+"use strict";
+
 require("dotenv").config();
 const mongoose = require("mongoose");
 const mySecret = process.env["MONGO_URI"];
@@ -39,10 +41,7 @@ const createIssue = (
     status_text: statusText,
   });
   issue.save();
-  let myIssue = issue.toObject();
-  delete myIssue.project;
-  let myRes = JSON.stringify(myIssue);
-  return myRes;
+  return issue;
 };
 
 /*
