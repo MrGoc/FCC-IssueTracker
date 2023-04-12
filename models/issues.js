@@ -41,7 +41,7 @@ const createIssue = (
     status_text: statusText,
   });
   issue.save();
-  return issue;
+  return convertIssue(issue);
 };
 
 const convertIssue = (issue) => {
@@ -56,6 +56,33 @@ const convertIssue = (issue) => {
     open: issue.open,
     status_text: issue.status_text,
   };
+};
+
+const getIssues = (
+  project,
+  id,
+  title,
+  text,
+  createdOn,
+  updatedOn,
+  createdBy,
+  assignedTo,
+  open,
+  statusText
+) => {
+  let issues = Issue.find({ project: project });
+
+  if (id !== undefined) issues.where({ _id: id });
+  if (title !== undefined) issues.where({ issue_title: title });
+  if (text !== undefined) issues.where({ issue_text: text });
+  if (createdOn !== undefined) issues.where({ created_on: createdOn });
+  if (updatedOn !== undefined) issues.where({ updated_on: updatedOn });
+  if (createdBy !== undefined) issues.where({ created_by: createdBy });
+  if (assignedTo !== undefined) issues.where({ assigned_to: assignedTo });
+  if (open !== undefined) issues.where({ open: open });
+  if (statusText !== undefined) issues.where({ status_text: statusText });
+
+  return issues.exec();
 };
 
 /*
@@ -80,5 +107,6 @@ exports.User = User;
 exports.getSingleUser = getSingleUser;
 */
 exports.createIssue = createIssue;
+exports.getIssues = getIssues;
 exports.convertIssue = convertIssue;
 exports.Issue = Issue;

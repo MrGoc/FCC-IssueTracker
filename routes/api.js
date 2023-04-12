@@ -8,6 +8,25 @@ module.exports = function (app) {
 
     .get(function (req, res) {
       let project = req.params.project;
+      let issueRes = issues.getIssues(
+        project,
+        req.query._id,
+        req.query.issue_title,
+        req.query.issue_text,
+        req.query.created_on,
+        req.query.updated_on,
+        req.query.created_by,
+        req.query.assigned_to,
+        req.query.open,
+        req.query.status_text
+      );
+      issueRes.then((docs) => {
+        let issueArr = [];
+        docs.forEach((issue) => {
+          issueArr.push(issues.convertIssue(issue));
+        });
+        res.send(issueArr);
+      });
     })
 
     .post(function (req, res) {
@@ -20,7 +39,7 @@ module.exports = function (app) {
         req.body.assigned_to,
         req.body.status_text
       );
-      res.send(issues.convertIssue(issue));
+      res.send(issue);
     })
 
     .put(function (req, res) {
