@@ -44,6 +44,13 @@ module.exports = function (app) {
 
     .put(function (req, res) {
       let project = req.params.project;
+      issues.Issue.findOneAndUpdate(
+        { project: project, _id: req.body._id },
+        { open: false },
+        { new: true }
+      ).then((issue) => {
+        res.send(issues.convertIssue(issue));
+      });
     })
 
     .delete(function (req, res) {

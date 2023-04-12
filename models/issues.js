@@ -109,4 +109,5 @@ exports.getSingleUser = getSingleUser;
 exports.createIssue = createIssue;
 exports.getIssues = getIssues;
 exports.convertIssue = convertIssue;
+//exports.closeIssue = closeIssue;
 exports.Issue = Issue;
