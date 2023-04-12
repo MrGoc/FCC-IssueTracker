@@ -20,7 +20,7 @@ module.exports = function (app) {
         req.body.assigned_to,
         req.body.status_text
       );
-      res.send(issue);
+      res.send(issues.convertIssue(issue));
     })
 
     .put(function (req, res) {
