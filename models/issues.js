@@ -7,15 +7,15 @@ const mySecret = process.env["MONGO_URI"];
 mongoose.connect(mySecret, { useNewUrlParser: true, useUnifiedTopology: true });
 
 let issuesShema = new mongoose.Schema({
-  project: String,
-  issue_title: String,
-  issue_text: String,
-  created_on: Date,
-  updated_on: Date,
-  created_by: String,
-  assigned_to: String,
-  open: Boolean,
-  status_text: String,
+  project: { type: String, required: true },
+  issue_title: { type: String, required: true },
+  issue_text: { type: String, required: true },
+  created_by: { type: String, required: true },
+  assigned_to: { type: String, default: "" },
+  status_text: { type: String, default: "" },
+  created_on: { type: Date, default: Date() },
+  updated_on: { type: Date, default: Date() },
+  open: { type: Boolean, default: true },
 });
 
 let Issue = mongoose.model("Issue", issuesShema, "issues");
@@ -58,34 +58,6 @@ const convertIssue = (issue) => {
   };
 };
 
-const getIssues = (
-  project,
-  id,
-  title,
-  text,
-  createdOn,
-  updatedOn,
-  createdBy,
-  assignedTo,
-  open,
-  statusText
-) => {
-  let issues = Issue.find({ project: project });
-
-  if (id !== undefined) issues.where({ _id: id });
-  if (title !== undefined) issues.where({ issue_title: title });
-  if (text !== undefined) issues.where({ issue_text: text });
-  if (createdOn !== undefined) issues.where({ created_on: createdOn });
-  if (updatedOn !== undefined) issues.where({ updated_on: updatedOn });
-  if (createdBy !== undefined) issues.where({ created_by: createdBy });
-  if (assignedTo !== undefined) issues.where({ assigned_to: assignedTo });
-  if (open !== undefined) issues.where({ open: open });
-  if (statusText !== undefined) issues.where({ status_text: statusText });
-
-  return issues.exec();
-};
-
 exports.createIssue = createIssue;
-exports.getIssues = getIssues;
 exports.convertIssue = convertIssue;
 exports.Issue = Issue;
