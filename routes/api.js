@@ -55,5 +55,10 @@ module.exports = function (app) {
 
     .delete(function (req, res) {
       let project = req.params.project;
+      issues.Issue.deleteOne({ project: project, _id: req.body._id }).then(
+        (iss) => {
+          res.send(iss.deletedCount.toString());
+        }
+      );
     });
 };
