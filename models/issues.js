@@ -85,29 +85,7 @@ const getIssues = (
   return issues.exec();
 };
 
-/*
-const createUser = (userName) => {
-  let user = new User({ username: userName });
-  user.save();
-  return user;
-};
-
-async function getUsers() {
-  let users = await User.find({});
-  return users;
-}
-
-const getSingleUser = async (userId) => {
-  let user = await User.findById(userId);
-  return user;
-};
-
-exports.getUsers = getUsers;
-exports.User = User;
-exports.getSingleUser = getSingleUser;
-*/
 exports.createIssue = createIssue;
 exports.getIssues = getIssues;
 exports.convertIssue = convertIssue;
-//exports.closeIssue = closeIssue;
 exports.Issue = Issue;
