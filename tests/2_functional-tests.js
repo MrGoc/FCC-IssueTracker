@@ -5,6 +5,7 @@ const server = require("../server");
 const issues = require("./../models/issues.js");
 
 chai.use(chaiHttp);
+let idToUpdate;
 
 suite("Functional Tests", function () {
   suiteSetup(async () => {
@@ -146,6 +147,95 @@ suite("Functional Tests", function () {
         assert.equal(res.body[0].assigned_to, "");
         assert.equal(res.body[0].open, true);
         assert.equal(res.body[0].status_text, "");
+        idToUpdate = res.body[0]._id;
+        done();
+      });
+  });
+
+  test("Update one field", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .put("/api/issues/TestProject")
+      .type("form")
+      .send({
+        _id: idToUpdate,
+        assigned_to: "test_user2",
+      })
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.result, "successfully updated");
+        assert.equal(res.body._id, idToUpdate);
+        done();
+      });
+  });
+
+  test("Update multiple fields on an issue: PUT request to /api/issues/{project}", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .put("/api/issues/TestProject")
+      .type("form")
+      .send({
+        _id: idToUpdate,
+        assigned_to: "test_user33",
+        status_text: "test",
+      })
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.result, "successfully updated");
+        assert.equal(res.body._id, idToUpdate);
+        done();
+      });
+  });
+
+  test("Update an issue with missing _id: PUT request to /api/issues/{project}", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .put("/api/issues/TestProject")
+      .type("form")
+      .send({
+        assigned_to: "test_user34",
+      })
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.error, "missing _id");
+        done();
+      });
+  });
+
+  test("Update an issue with no fields to update: PUT request to /api/issues/{project}", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .put("/api/issues/TestProject")
+      .type("form")
+      .send({
+        _id: idToUpdate,
+      })
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.error, "no update field(s) sent");
+        assert.equal(res.body._id, idToUpdate);
+        done();
+      });
+  });
+
+  test("Update an issue with an invalid _id: PUT request to /api/issues/{project}", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .put("/api/issues/TestProject")
+      .type("form")
+      .send({
+        _id: "5e0af1c63b6482125c1b42cb",
+        assigned_to: "test_user34",
+      })
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.error, "could not update");
+        assert.equal(res.body._id, "5e0af1c63b6482125c1b42cb");
         done();
       });
   });
