@@ -34,11 +34,11 @@ module.exports = function (app) {
             project: project,
             issue_title: req.body.issue_title,
             issue_text: req.body.issue_text,
-            created_on: now,
-            updated_on: now,
+            created_on: req.body.created_on || now,
+            updated_on: req.body.updated_on || now,
             created_by: req.body.created_by,
             assigned_to: req.body.assigned_to,
-            open: true,
+            open: req.body.open || true,
             status_text: req.body.status_text,
           })
           .save()
