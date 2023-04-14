@@ -2,15 +2,20 @@ const chaiHttp = require("chai-http");
 const chai = require("chai");
 const assert = chai.assert;
 const server = require("../server");
+const issues = require("./../models/issues.js");
 
 chai.use(chaiHttp);
 
 suite("Functional Tests", function () {
+  suiteSetup(async () => {
+    await issues.Issue.deleteMany({ project: "TestProject" });
+  });
+
   test("Create an issue with every field: POST request to /api/issues/{project}", function (done) {
     chai
       .request(server)
       .keepOpen()
-      .post("/api/issues/testproj")
+      .post("/api/issues/TestProject")
       .type("form")
       .send({
         issue_title: "testproj_title",
@@ -40,7 +45,7 @@ suite("Functional Tests", function () {
     chai
       .request(server)
       .keepOpen()
-      .post("/api/issues/testproj")
+      .post("/api/issues/TestProject")
       .type("form")
       .send({
         issue_title: "testproj_title_2",
@@ -63,7 +68,7 @@ suite("Functional Tests", function () {
     chai
       .request(server)
       .keepOpen()
-      .post("/api/issues/testproj")
+      .post("/api/issues/TestProject")
       .type("form")
       .send({
         issue_title: "testproj_title_3",
@@ -77,20 +82,71 @@ suite("Functional Tests", function () {
   });
 
   test("View issues on a project: GET request to /api/issues/{project}", function (done) {
-    /*
     chai
       .request(server)
       .keepOpen()
-      .post("/api/issues/testproj")
-      .type("form")
-      .send({
-        issue_title: "testproj_title_3",
-        created_by: "test_user_3",
+      .get("/api/issues/TestProject")
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.length, 2);
+
+        assert.equal(res.body[0].issue_title, "testproj_title");
+        assert.equal(res.body[0].issue_text, "testproj_text");
+        assert.equal(res.body[0].created_on, "2023-04-01T05:25:07.549Z");
+        assert.equal(res.body[0].updated_on, "2023-04-02T23:25:11.243Z");
+        assert.equal(res.body[0].created_by, "test_user");
+        assert.equal(res.body[0].assigned_to, "test_user2");
+        assert.equal(res.body[0].open, false);
+        assert.equal(res.body[0].status_text, "test_status_text");
+
+        assert.equal(res.body[1].issue_title, "testproj_title_2");
+        assert.equal(res.body[1].issue_text, "testproj_text_2");
+        assert.equal(res.body[1].created_by, "test_user_2");
+        assert.equal(res.body[1].assigned_to, "");
+        assert.equal(res.body[1].open, true);
+        assert.equal(res.body[1].status_text, "");
+        done();
+      });
+  });
+  test("View issues on a project with one filter: GET request to /api/issues/{project}", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .get("/api/issues/TestProject")
+      .query({ created_by: "test_user_2" })
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.length, 1);
+        assert.equal(res.body[0].issue_title, "testproj_title_2");
+        assert.equal(res.body[0].issue_text, "testproj_text_2");
+        assert.equal(res.body[0].created_by, "test_user_2");
+        assert.equal(res.body[0].assigned_to, "");
+        assert.equal(res.body[0].open, true);
+        assert.equal(res.body[0].status_text, "");
+        done();
+      });
+  });
+
+  test("View issues on a project with multiple filters: GET request to /api/issues/{project}", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .get("/api/issues/TestProject")
+      .query({
+        created_by: "test_user_2",
+        issue_text: "testproj_text_2",
+        open: true,
       })
       .end(function (err, res) {
         assert.equal(res.status, 200);
-        assert.equal(res.body.error, "required field(s) missing");
+        assert.equal(res.body.length, 1);
+        assert.equal(res.body[0].issue_title, "testproj_title_2");
+        assert.equal(res.body[0].issue_text, "testproj_text_2");
+        assert.equal(res.body[0].created_by, "test_user_2");
+        assert.equal(res.body[0].assigned_to, "");
+        assert.equal(res.body[0].open, true);
+        assert.equal(res.body[0].status_text, "");
         done();
-      });*/
+      });
   });
 });
