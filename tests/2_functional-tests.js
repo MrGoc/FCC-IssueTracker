@@ -239,4 +239,50 @@ suite("Functional Tests", function () {
         done();
       });
   });
+
+  test("Delete an issue: DELETE request to /api/issues/{project}", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .delete("/api/issues/TestProject")
+      .type("form")
+      .send({
+        _id: idToUpdate,
+      })
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.result, "successfully deleted");
+        assert.equal(res.body._id, idToUpdate);
+        done();
+      });
+  });
+
+  test("Delete an issue with an invalid _id: DELETE request to /api/issues/{project}", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .delete("/api/issues/TestProject")
+      .type("form")
+      .send({
+        _id: "5e0af1c63b6482125c1b42cb",
+      })
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.error, "could not delete");
+        assert.equal(res.body._id, "5e0af1c63b6482125c1b42cb");
+        done();
+      });
+  });
+
+  test("Delete an issue with missing _id: DELETE request to /api/issues/{project}", function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .delete("/api/issues/TestProject")
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.error, "missing _id");
+        done();
+      });
+  });
 });
