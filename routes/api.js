@@ -60,38 +60,41 @@ module.exports = function (app) {
 
     .put(function (req, res) {
       if (!req.body._id) res.send({ error: "missing _id" });
-      else if (Object.keys(req.body).length === 0)
+      else if (Object.keys(req.body).length === 1)
         res.send({ error: "no update field(s) sent", _id: req.body._id });
       else {
         let project = req.params.project;
-        let myIssue = issues.Issue.findOne(req.body._id);
-        if (!myIssue)
-          res.send({ error: "could not update", _id: req.body._id });
-        else {
-          Object.keys(req.body).map((field) => {
-            myIssue[field] = req.body[field];
-          });
-          myIssue.updated_on = Date.now();
-          myIssue
-            .save()
-            .then((issue) =>
-              res.send({ result: "successfully updated", _id: issue._id })
-            )
-            .catch((err) => {
-              res.send({ error: "could not update", _id: req.body._id });
+        let filter = { _id: req.body._id, project: project };
+        issues.Issue.findOne(filter).then((issue, err) => {
+          if (!issue)
+            res.send({ error: "could not update", _id: req.body._id });
+          else {
+            Object.keys(req.body).map((field) => {
+              issue[field] = req.body[field];
             });
-        }
+            issue.updated_on = Date.now();
+            issue
+              .save()
+              .then((issue) =>
+                res.send({ result: "successfully updated", _id: issue._id })
+              )
+              .catch((err) => {
+                res.send({ error: "could not update", _id: req.body._id });
+              });
+          }
+        });
       }
     })
 
     .delete(function (req, res) {
-      if (req.body._id === undefined || req.body._id === "")
-        res.send({ error: "missing _id" });
+      if (!req.body._id) res.send({ error: "missing _id" });
       else {
         let project = req.params.project;
         issues.Issue.deleteOne({ project: project, _id: req.body._id })
-          .then((iss) => {
-            res.send({ result: "successfully deleted", _id: req.body._id });
+          .then((result) => {
+            if (result.deletedCount === 1)
+              res.send({ result: "successfully deleted", _id: req.body._id });
+            else res.send({ error: "could not delete", _id: req.body._id });
           })
           .catch((err) => {
             res.send({ error: "could not delete", _id: req.body._id });
